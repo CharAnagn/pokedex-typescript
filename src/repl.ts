@@ -1,4 +1,7 @@
 import { createInterface } from "readline";
+import { CLICommand } from "./types/types.js";
+import { commandExit } from "./command_exit.js";
+import { commandHelp } from "./command_help.js";
 
 export function cleanInput(input: string): string[] {
   const splitInput = input.split(" ");
@@ -6,6 +9,22 @@ export function cleanInput(input: string): string[] {
   return splitInput
     .map((word) => word.trim().toLowerCase())
     .filter((word) => word !== "");
+}
+
+export function getCommands(): Record<string, CLICommand> {
+  return {
+    exit: {
+      name: "exit",
+      description: "Exits the pokedex",
+      callback: commandExit,
+    },
+    help: {
+      name: "help",
+      description: "Displays a help message",
+      callback: commandHelp,
+    },
+    // can add more commands here
+  };
 }
 
 export function startREPL() {
@@ -16,15 +35,29 @@ export function startREPL() {
   });
 
   rl.prompt();
-  rl.on("line", (input) => {
-    const arrayOfWords = cleanInput(input);
 
-    if (arrayOfWords.length === 0) {
+  rl.on("line", (input) => {
+    const words = cleanInput(input);
+
+    if (words.length === 0) {
       rl.prompt();
     }
 
-    console.log(`Your command was: ${arrayOfWords[0]}`);
+    const userCommand = words[0];
+    const knownCommands = getCommands();
 
-    rl.prompt();
+    if (userCommand in knownCommands) {
+      try {
+        knownCommands[userCommand].callback(getCommands());
+      } catch (err) {
+        if (err instanceof Error) {
+          console.log(`Error: ${err.message}`);
+        }
+      }
+    } else {
+      console.log("Unknown command");
+      rl.prompt();
+      return;
+    }
   });
 }
