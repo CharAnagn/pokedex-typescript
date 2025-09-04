@@ -15,12 +15,12 @@ export function getCommands() {
         },
         map: {
             name: "map",
-            description: "It displays the names of 20 location areas in the Pokemon world",
+            description: "Get the next page of locations",
             callback: commandMapFoward,
         },
         mapb: {
             name: "map",
-            description: "It displays the names of 20 location areas in the Pokemon world",
+            description: "Get the previous page of locations",
             callback: commandMapBackwards,
         },
     };
